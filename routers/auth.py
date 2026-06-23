@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
-from schemas.auth import RegisterSchema
+from schemas.auth import RegisterSchema, LoginSchema
 from models.user import User
+from utils.jwt import create_token
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -12,3 +13,13 @@ async def register(data: RegisterSchema):
     user = User(**data.dict())
     await user.insert()
     return {"message": "User registered"}
+
+@router.post("/login")
+async def login(data: LoginSchema):
+    user = await User.find_one(User.email == data.email)
+    if not user:
+        raise HTTPException(status_code=401, detail="Wrong credentials")
+    if user.password != data.password:
+        raise HTTPException(status_code=401, detail="Wrong credentials")
+    token = create_token({"id": str(user.id), "role": user.role})
+    return {"token": token}
