@@ -23,3 +23,7 @@ async def login(data: LoginSchema):
         raise HTTPException(status_code=401, detail="Wrong credentials")
     token = create_token({"id": str(user.id), "role": user.role})
     return {"token": token}
+
+@router.get("/users")
+async def get_all_users():
+    return await User.find_all().to_list()
