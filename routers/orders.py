@@ -24,3 +24,7 @@ async def create_order(data: CreateOrderSchema):
     order = Order(user_id="user_id", items=items, total_price=total_price)
     await order.insert()
     return order
+
+@router.get("/my")
+async def my_orders():
+    return await Order.find_all().to_list()
