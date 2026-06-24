@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from models.order import Order
 from models.menu import MenuItem
-from schemas.orders import CreateOrderSchema
+from schemas.orders import CreateOrderSchema, StatusSchema
 
 router = APIRouter(prefix="/orders", tags=["Orders"])
 
@@ -32,3 +32,12 @@ async def my_orders():
 @router.get("/")
 async def all_orders():
     return await Order.find_all().to_list()
+
+@router.patch("/{id}/status")
+async def update_status(id: str, data: StatusSchema):
+    order = await Order.get(id)
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    order.status = data.status
+    await order.save()
+    return order
