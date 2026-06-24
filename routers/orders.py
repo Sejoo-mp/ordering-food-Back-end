@@ -28,3 +28,7 @@ async def create_order(data: CreateOrderSchema):
 @router.get("/my")
 async def my_orders():
     return await Order.find_all().to_list()
+
+@router.get("/")
+async def all_orders():
+    return await Order.find_all().to_list()
